@@ -2,5 +2,5 @@
 
 - RayTracingInOneWeekend
     
-    ![最终结果](image1.ppm)
+    ![最终结果](Series_1.png)
 
