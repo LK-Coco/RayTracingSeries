@@ -1,11 +1,11 @@
 #pragma once
 
-#include "hittable.h"
 #include "hittable_list.h"
 
 namespace cray {
 
-struct BVHNode : public Hittable {
+class BVHNode : public Hittable {
+public:
     BVHNode(const HittableList& list)
         : BVHNode(list.objects, 0, list.objects.size()) {}
     BVHNode(const std::vector<std::shared_ptr<Hittable>>& objs,

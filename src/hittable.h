@@ -7,7 +7,8 @@
 
 namespace cray {
 
-struct Hittable {
+class Hittable {
+public:
     virtual ~Hittable() = default;
 
     virtual bool hit(const Ray& ray, const Interval& interval,

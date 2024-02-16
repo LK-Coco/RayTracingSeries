@@ -6,7 +6,8 @@
 
 namespace cray {
 
-struct HittableList : public Hittable {
+class HittableList : public Hittable {
+public:
     HittableList() {}
     HittableList(std::shared_ptr<Hittable> obj) { add(obj); }
 

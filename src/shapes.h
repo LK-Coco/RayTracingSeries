@@ -4,7 +4,8 @@
 
 namespace cray {
 
-struct Sphere : public Hittable {
+class Sphere : public Hittable {
+public:
     // 静态球体
     Sphere(Point3 _center, double _radius, std::shared_ptr<Material> _mat)
         : center(_center),

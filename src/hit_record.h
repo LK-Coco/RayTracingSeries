@@ -12,7 +12,12 @@ struct HitRecord {
     Point3 p;
     Vec3 normal;
     double t;
+
+    double u;
+    double v;
+
     std::shared_ptr<Material> mat;
+
     bool is_front_face;
 
     void set_front_normal(const Ray& ray, const Vec3& outway_normal) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hit_record.h"
+#include "texture.h"
 
 namespace cray {
 
@@ -12,12 +13,13 @@ struct Material {
 };
 
 struct Lambertian : public Material {
-    Lambertian(const Color& c) : albedo(c) {}
+    Lambertian(const Color& c) : albedo(std::make_shared<SolidColorTex>(c)) {}
+    Lambertian(std::shared_ptr<Texture> tex) : albedo(tex) {}
 
     bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation,
                  Ray& scattered) const override;
 
-    Color albedo;
+    std::shared_ptr<Texture> albedo;
 };
 
 struct Metal : public Material {

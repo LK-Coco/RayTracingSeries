@@ -4,13 +4,18 @@
 #include "camera.h"
 #include "shapes.h"
 #include "hittable_list.h"
+#include "bvh.h"
+#include "texture.h"
 
 using namespace cray;
 
 int main() {
     HittableList world;
 
-    auto ground_material = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+    auto tex = std::make_shared<CheckerTex>(0.32, Color(.2, .3, .1),
+                                            Color(.9, .9, .9));
+
+    auto ground_material = std::make_shared<Lambertian>(tex);
     world.add(
         std::make_shared<Sphere>(Point3(0, -1000, 0), 1000, ground_material));
 
@@ -55,11 +60,13 @@ int main() {
     auto material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
     world.add(std::make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
 
+    world = HittableList(std::make_shared<BVHNode>(world));
+
     Camera cam;
-    cam.image_width = 1200;
+    cam.image_width = 200;  // 1200;
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.samples_per_pixel = 500;
-    cam.max_depth = 50;
+    cam.samples_per_pixel = 50;  // 500;
+    cam.max_depth = 10;          // 50;
 
     cam.fov = 20;
     cam.position = Point3(13, 2, 3);
