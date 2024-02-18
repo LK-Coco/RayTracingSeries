@@ -8,6 +8,8 @@
 const double Infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
 
+static unsigned char Magenta[] = {255, 0, 255};  // 洋红色
+
 // Utility Functions
 
 inline double degrees_to_radians(double degrees) {
@@ -30,4 +32,11 @@ inline double random_double(double min, double max) {
 // 返回[min,max]
 inline int random_int(int min, int max) {
     return static_cast<int>(random_double(min, max + 1));
+}
+
+// return clamp[low,high)
+inline int clamp(int x, int low, int high) {
+    if (x < low) return low;
+    if (x < high) return x;
+    return high - 1;
 }

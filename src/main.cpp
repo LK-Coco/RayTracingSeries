@@ -9,7 +9,7 @@
 
 using namespace cray;
 
-int main() {
+void render_example_world() {
     HittableList world;
 
     auto tex = std::make_shared<CheckerTex>(0.32, Color(.2, .3, .1),
@@ -81,3 +81,30 @@ int main() {
 
     cam.render(world, file);
 }
+
+void render_earth() {
+    std::string path = "data/earthmap.jpg";
+    auto earth_texture = std::make_shared<ImageTex>(path);
+    auto earth_surface = std::make_shared<Lambertian>(earth_texture);
+    auto globe = std::make_shared<Sphere>(Point3(0, 0, 0), 2, earth_surface);
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 500;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.fov = 20;
+    cam.position = Point3(0, 0, 12);
+    cam.look_at = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    std::ofstream file;
+    file.open("earth.ppm", std::ios::out | std::ios::trunc);
+    cam.render(HittableList(globe), file);
+}
+
+int main() { render_earth(); }

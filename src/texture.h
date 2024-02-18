@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cgmath.h"
+#include "cray_image.h"
 
 namespace cray {
 
@@ -36,6 +37,14 @@ struct CheckerTex : public Texture {
     double inv_scale;
     std::shared_ptr<Texture> even;
     std::shared_ptr<Texture> odd;
+};
+
+struct ImageTex : public Texture {
+    ImageTex(const std::string& path) : image(path) {}
+
+    Color value(double u, double v, const Point3& p) const override;
+
+    CRayImage image;
 };
 
 }  // namespace cray
