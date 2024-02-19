@@ -40,4 +40,28 @@ bool Sphere::hit(const Ray& ray, const Interval& interval,
     return true;
 }
 
+bool Quad::hit(const Ray& ray, const Interval& interval, HitRecord& rec) const {
+    auto denom = dot(normal, ray.dir);  // 分母
+    if (fabs(denom) < 1e-8) return false;
+
+    auto t = (D - dot(normal, ray.origin)) / denom;
+    if (!interval.contains(t)) return false;
+
+    // 判断交点是否在Quad内部
+    auto intersection = ray.at(t);
+    Vec3 p = intersection - Q;
+    auto alpha = dot(W, cross(p, v));
+    auto beta = dot(W, cross(u, p));
+    if (alpha < 0 || alpha > 1 || beta < 0 || beta > 1) return false;
+    rec.u = alpha;
+    rec.v = beta;
+
+    rec.t = t;
+    rec.p = intersection;
+    rec.mat = mat;
+    rec.set_front_normal(ray, normal);
+
+    return true;
+}
+
 }  // namespace cray

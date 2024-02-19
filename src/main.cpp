@@ -135,4 +135,45 @@ void render_noise() {
     cam.render(world, file);
 }
 
-int main() { render_noise(); }
+void render_quads() {
+    HittableList world;
+
+    // Materials
+    auto left_red = std::make_shared<Lambertian>(Color(1.0, 0.2, 0.2));
+    auto back_green = std::make_shared<Lambertian>(Color(0.2, 1.0, 0.2));
+    auto right_blue = std::make_shared<Lambertian>(Color(0.2, 0.2, 1.0));
+    auto upper_orange = std::make_shared<Lambertian>(Color(1.0, 0.5, 0.0));
+    auto lower_teal = std::make_shared<Lambertian>(Color(0.2, 0.8, 0.8));
+
+    // Quads
+    world.add(std::make_shared<Quad>(Point3(-3, -2, 5), Vec3(0, 0, -4),
+                                     Vec3(0, 4, 0), left_red));
+    world.add(std::make_shared<Quad>(Point3(-2, -2, 0), Vec3(4, 0, 0),
+                                     Vec3(0, 4, 0), back_green));
+    world.add(std::make_shared<Quad>(Point3(3, -2, 1), Vec3(0, 0, 4),
+                                     Vec3(0, 4, 0), right_blue));
+    world.add(std::make_shared<Quad>(Point3(-2, 3, 1), Vec3(4, 0, 0),
+                                     Vec3(0, 0, 4), upper_orange));
+    world.add(std::make_shared<Quad>(Point3(-2, -3, 5), Vec3(4, 0, 0),
+                                     Vec3(0, 0, -4), lower_teal));
+
+    Camera cam;
+
+    cam.aspect_ratio = 1.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.fov = 80;
+    cam.position = Point3(0, 0, 9);
+    cam.look_at = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    std::ofstream file;
+    file.open("quad.ppm", std::ios::out | std::ios::trunc);
+    cam.render(world, file);
+}
+
+int main() { render_quads(); }

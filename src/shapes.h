@@ -48,4 +48,37 @@ public:
     AABB aabb;
 };
 
+class Quad : public Hittable {
+public:
+    Quad(const Point3& _Q, const Vec3& _u, const Vec3& _v,
+         std::shared_ptr<Material> m)
+        : Q(_Q),
+          u(_u),
+          v(_v),
+          mat(m) {
+        auto n = cross(u, v);
+        W = n / dot(n, n);
+        normal = unit_vector(n);
+        D = dot(normal, Q);
+        set_bounding_box();
+    }
+
+    virtual void set_bounding_box() { bbox = AABB(Q, Q + u + v).pad(); }
+
+    AABB bounding_box() const override { return bbox; }
+
+    bool hit(const Ray& ray, const Interval& interval,
+             HitRecord& rec) const override;
+
+private:
+    Point3 Q;
+    Vec3 u, v;  // 两条边的向量
+    std::shared_ptr<Material> mat;
+    AABB bbox;
+
+    Vec3 normal;
+    double D;
+    Vec3 W;
+};
+
 }  // namespace cray
