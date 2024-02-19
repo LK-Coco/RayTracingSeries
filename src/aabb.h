@@ -61,4 +61,12 @@ struct AABB {
     Interval x, y, z;
 };
 
+inline AABB operator+(const AABB& aabb, const Vec3& offset) {
+    return AABB(aabb.x + offset.x, aabb.y + offset.y, aabb.z + offset.z);
+}
+
+inline AABB operator+(const Vec3& offset, const AABB& aabb) {
+    return aabb + offset;
+}
+
 }  // namespace cray

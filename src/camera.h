@@ -6,7 +6,9 @@ namespace cray {
 
 class Camera {
 public:
-    void render(const Hittable& world, std::ostream& out);
+    // void render(const Hittable& world, std::ostream& out);
+
+    void render_to_png(const Hittable& world, const char* file_name);
 
     int image_width = 100;
     double aspect_ratio = 1.0;
@@ -21,6 +23,8 @@ public:
 
     int samples_per_pixel = 10;
     int max_depth = 10;
+
+    Color background;  // 背景颜色
 
 private:
     void init();

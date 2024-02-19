@@ -1,27 +1,37 @@
 #include "camera.h"
 #include "material.h"
 #include <iostream>
+#include <fstream>
+#include "stb_image_write.h"
 
 namespace cray {
 
 double linear_to_gamma(double linear_comp) { return sqrt(linear_comp); }
 
-void write_color(std::ostream& out, Color pixel_color, double scale) {
+// void write_color(std::ostream& out, Color pixel_color, double scale) {
+//     static const Interval cl(0.000, 0.999);
+
+//     auto r = linear_to_gamma(pixel_color.r * scale);
+//     auto g = linear_to_gamma(pixel_color.g * scale);
+//     auto b = linear_to_gamma(pixel_color.b * scale);
+
+//     out << static_cast<int>(255.999 * cl.clamp(r)) << ' '
+//         << static_cast<int>(255.999 * cl.clamp(g)) << ' '
+//         << static_cast<int>(255.999 * cl.clamp(b)) << '\n';
+// }
+
+uint8_t final_color(double c, double scale) {
     static const Interval cl(0.000, 0.999);
 
-    auto r = linear_to_gamma(pixel_color.r * scale);
-    auto g = linear_to_gamma(pixel_color.g * scale);
-    auto b = linear_to_gamma(pixel_color.b * scale);
-
-    out << static_cast<int>(255.999 * cl.clamp(r)) << ' '
-        << static_cast<int>(255.999 * cl.clamp(g)) << ' '
-        << static_cast<int>(255.999 * cl.clamp(b)) << '\n';
+    auto r = linear_to_gamma(c * scale);
+    return static_cast<int>(255.999 * cl.clamp(r));
 }
 
-void Camera::render(const Hittable& world, std::ostream& out) {
+void Camera::render_to_png(const Hittable& world, const char* file_name) {
     init();
 
-    out << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    uint8_t* pixels = new uint8_t[image_width * image_height * 3];
+    int index = 0;
 
     const auto scale = 1.0 / samples_per_pixel;
 
@@ -32,10 +42,15 @@ void Camera::render(const Hittable& world, std::ostream& out) {
                 auto ray = get_ray(i, j);
                 pixel_color += ray_color(ray, world, max_depth);
             }
-
-            write_color(out, pixel_color, scale);
+            pixels[index] = final_color(pixel_color.r, scale);
+            pixels[index + 1] = final_color(pixel_color.g, scale);
+            pixels[index + 2] = final_color(pixel_color.b, scale);
+            index += 3;
         }
     }
+
+    stbi_write_png(file_name, image_width, image_height, 3, pixels,
+                   image_width * 3);
 }
 
 void Camera::init() {
@@ -81,18 +96,25 @@ Color Camera::ray_color(const Ray& ray, const Hittable& world,
 
     HitRecord rec;
 
-    if (world.hit(ray, Interval(0.001, Infinity), rec)) {
-        Color attenuation;
-        Ray scattered_ray;
-        if (rec.mat != nullptr &&
-            rec.mat->scatter(ray, rec, attenuation, scattered_ray))
-            return attenuation * ray_color(scattered_ray, world, depth - 1);
-        return Color(0, 0, 0);
+    if (!world.hit(ray, Interval(0.001, Infinity), rec)) {
+        return background;
     }
 
-    Vec3 unit_direction = unit_vector(ray.dir);
-    auto a = 0.5 * (unit_direction.y + 1.0);
-    return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
+    Color attenuation;
+    Ray scattered_ray;
+
+    Color color_emit = rec.mat->emitted(rec.u, rec.v, rec.p);
+
+    if (!rec.mat->scatter(ray, rec, attenuation, scattered_ray))
+        return color_emit;
+    Color colo_scatter =
+        attenuation * ray_color(scattered_ray, world, depth - 1);
+    return color_emit + colo_scatter;
+
+    // 默认的天空盒背景颜色实现
+    // Vec3 unit_direction = unit_vector(ray.dir);
+    // auto a = 0.5 * (unit_direction.y + 1.0);
+    // return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
 }
 
 Vec3 Camera::pixel_sample_square() const {
