@@ -107,4 +107,32 @@ void render_earth() {
     cam.render(HittableList(globe), file);
 }
 
-int main() { render_earth(); }
+void render_noise() {
+    HittableList world;
+
+    auto pertext = std::make_shared<NoiseTex>(4);
+    world.add(std::make_shared<Sphere>(Point3(0, -1000, 0), 1000,
+                                       make_shared<Lambertian>(pertext)));
+    world.add(std::make_shared<Sphere>(Point3(0, 2, 0), 2,
+                                       make_shared<Lambertian>(pertext)));
+
+    Camera cam;
+
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth = 50;
+
+    cam.fov = 20;
+    cam.position = Point3(13, 2, 3);
+    cam.look_at = Point3(0, 0, 0);
+    cam.up = Vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    std::ofstream file;
+    file.open("noise.ppm", std::ios::out | std::ios::trunc);
+    cam.render(world, file);
+}
+
+int main() { render_noise(); }

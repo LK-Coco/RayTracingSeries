@@ -2,6 +2,7 @@
 
 #include "cgmath.h"
 #include "cray_image.h"
+#include "perlin.h"
 
 namespace cray {
 
@@ -45,6 +46,21 @@ struct ImageTex : public Texture {
     Color value(double u, double v, const Point3& p) const override;
 
     CRayImage image;
+};
+
+struct NoiseTex : public Texture {
+    NoiseTex() : scale(1.0) {}
+    NoiseTex(double scale_) : scale(scale_) {}
+
+    Color value(double u, double v, const Point3& p) const override {
+        // return Color(1, 1, 1) * 0.5 * (1.0 + perlin.noise(scale * p));
+
+        auto s = scale * p;
+        return Color(1, 1, 1) * 0.5 * (1 + sin(s.z + 10 * perlin.turb(s)));
+    }
+
+    Perlin perlin;
+    double scale;
 };
 
 }  // namespace cray
